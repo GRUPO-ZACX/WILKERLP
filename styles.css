@@ -105,9 +105,20 @@ body {
   overflow: hidden;
 }
 
+.heroPicture {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .heroBanner img {
+  position: absolute;
+  inset: 0;
   width: 100% !important;
   height: 100% !important;
+  display: block;
   object-fit: cover !important;
   object-position: top center;
 }
@@ -1462,12 +1473,22 @@ html[data-scrolled="true"] .headerLine {
     left: 0 !important;
     top: 0 !important;
     width: 100% !important;
-    height: 520px !important;
+    height: 680px !important;
+  }
+
+  .heroBanner::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    z-index: 1;
+    height: 220px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(17, 29, 23, 0) 0%, rgba(17, 29, 23, 0.58) 52%, #132019 100%);
   }
 
   .heroBanner img {
     object-fit: cover !important;
-    object-position: 52% top;
+    object-position: 58% top;
   }
 
   .bgBlurHero {
@@ -1588,14 +1609,16 @@ html[data-scrolled="true"] .headerLine {
 
   .heroTitle {
     z-index: 8;
-    width: 70% !important;
-    margin-top: 18px;
+    width: 72% !important;
+    max-width: 320px;
+    margin-top: 30px;
     padding-bottom: 6px;
   }
 
   .heroTitle h1 {
-    font-size: 26px !important;
-    line-height: 0.99 !important;
+    font-size: 30px !important;
+    line-height: 0.96 !important;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.42);
   }
 
   .heroTitle h1 > * {
@@ -1604,14 +1627,16 @@ html[data-scrolled="true"] .headerLine {
 
   .heroLead {
     z-index: 8;
-    width: 84% !important;
-    margin-top: 12px;
+    width: 82% !important;
+    max-width: 350px;
+    margin-top: 14px;
   }
 
   .heroLead p {
-    font-size: 13.5px !important;
-    line-height: 16.5px !important;
+    font-size: 14px !important;
+    line-height: 17.6px !important;
     text-align: left;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.38);
   }
 
   .cta {
@@ -1627,7 +1652,7 @@ html[data-scrolled="true"] .headerLine {
 
   .heroCta {
     z-index: 8;
-    margin-top: 18px;
+    margin-top: 20px;
   }
 
   .stats {
@@ -1635,7 +1660,8 @@ html[data-scrolled="true"] .headerLine {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px 18px;
-    margin-top: 48px;
+    margin-top: 36px;
+    margin-bottom: 98px;
   }
 
   .stats p,
