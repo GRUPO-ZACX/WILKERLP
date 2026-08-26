@@ -68,7 +68,7 @@ body {
 .artboard {
   position: relative;
   width: 100vw;
-  height: 524.9479166667vw;
+  height: 564.84375vw;
   min-height: 100dvh;
   overflow: hidden;
   background: var(--green);
@@ -385,8 +385,8 @@ html[data-scrolled="true"] .headerLine {
 }
 
 .protectCta {
-  border-radius: 0.477vw;
-  font-size: 0.953vw;
+  border-radius: 0.58vw;
+  font-size: 1.24vw;
   font-weight: 700;
 }
 
@@ -512,7 +512,7 @@ html[data-scrolled="true"] .headerLine {
 .riskList ul {
   display: flex;
   flex-direction: column;
-  gap: 0.637vw;
+  gap: 0.84vw;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -521,18 +521,18 @@ html[data-scrolled="true"] .headerLine {
 .riskList li {
   display: flex;
   align-items: center;
-  gap: 1.02vw;
-  color: rgba(255, 255, 255, 0.68);
+  gap: 1.08vw;
+  color: #ffffff;
   font-family: Inter, "Montserrat LP", Arial, sans-serif;
-  font-weight: 200;
+  font-weight: 300;
 }
 
 .riskList li::before {
   content: "";
-  flex: 0 0 0.637vw;
-  width: 0.637vw;
-  height: 0.637vw;
-  border: 0.058vw solid var(--gold);
+  flex: 0 0 0.72vw;
+  width: 0.72vw;
+  height: 0.72vw;
+  border: 0.07vw solid var(--gold);
   border-radius: 50%;
 }
 
@@ -595,17 +595,17 @@ html[data-scrolled="true"] .headerLine {
   z-index: 7;
   display: flex;
   flex-direction: column;
-  gap: 0.84vw;
+  gap: 1vw;
 }
 
 .serviceCard {
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: 5.4vw 1px 1fr;
-  gap: 1.55vw;
+  grid-template-columns: 7vw 1px 1fr;
+  gap: 2vw;
   align-items: center;
-  height: 8.45vw;
-  padding: 1.42vw 1.35vw 1.3vw 1.5vw;
+  height: 12vw;
+  padding: 1.8vw 2.2vw 1.8vw 1.9vw;
   border: 1px solid var(--line);
   background: rgba(38, 56, 48, 0.76);
 }
@@ -619,12 +619,12 @@ html[data-scrolled="true"] .headerLine {
 .serviceCard > i {
   display: block;
   width: 1px;
-  height: 4.9vw;
+  height: 7.1vw;
   background: rgba(255, 255, 255, 0.42);
 }
 
 .serviceCard h3 {
-  margin: 0 0 0.64vw;
+  margin: 0 0 0.82vw;
   color: #ffffff;
   font-weight: 600;
   text-transform: uppercase;
@@ -633,8 +633,8 @@ html[data-scrolled="true"] .headerLine {
 .serviceCard p {
   margin: 0;
   color: rgba(255, 255, 255, 0.82);
-  font-size: 0.67vw !important;
-  line-height: 0.72vw !important;
+  font-size: 1.08vw !important;
+  line-height: 1.34vw !important;
   font-weight: 400;
   text-align: justify;
 }
@@ -872,8 +872,8 @@ html[data-scrolled="true"] .headerLine {
 
 .aboutStats span {
   color: rgba(165, 165, 112, 0.82);
-  font-size: 0.84vw !important;
-  line-height: 0.94vw !important;
+  font-size: 0.92vw !important;
+  line-height: 1.04vw !important;
 }
 
 .trustTitle,
@@ -992,9 +992,9 @@ html[data-scrolled="true"] .headerLine {
   padding: 0 1.08vw;
   overflow: hidden;
   color: rgba(255, 255, 255, 0.72);
-  font-size: 0.88vw;
+  font-size: 0.98vw;
   font-weight: 300;
-  line-height: 1.12vw;
+  line-height: 1.24vw;
   letter-spacing: 0;
   transition:
     max-height 280ms var(--ease-out),
@@ -1012,7 +1012,7 @@ html[data-scrolled="true"] .headerLine {
 
 .miniItem:hover p,
 .miniItem:focus-within p {
-  max-height: 18vw;
+  max-height: 22vw;
   padding-bottom: 1.08vw;
   opacity: 1;
 }
@@ -1067,8 +1067,8 @@ html[data-scrolled="true"] .headerLine {
   margin: 0;
   color: #ffffff;
   font-family: "Crimson LP", serif;
-  font-size: 0.84vw;
-  line-height: 0.98vw;
+  font-size: 0.96vw;
+  line-height: 1.14vw;
   text-align: center;
 }
 
@@ -1255,9 +1255,9 @@ html[data-scrolled="true"] .headerLine {
   margin: 0;
   padding: 0.86vw 1.45vw 1.4vw;
   border-top: 1px solid rgba(38, 56, 48, 0.18);
-  font-size: 0.82vw;
+  font-size: 0.94vw;
   font-weight: 300;
-  line-height: 1vw;
+  line-height: 1.18vw;
   text-align: left;
 }
 
@@ -1314,7 +1314,7 @@ html[data-scrolled="true"] .headerLine {
   position: absolute;
   z-index: 8;
   left: 4vw;
-  top: 505.5729166667vw;
+  top: 552.34375vw;
   width: 92vw;
   height: 3.55vw;
   color: #ffffff;
@@ -1713,8 +1713,8 @@ html[data-scrolled="true"] .headerLine {
   .resolveCopy p,
   .aboutCopy p,
   .finalCopy p {
-    font-size: 14px !important;
-    line-height: 19px !important;
+    font-size: 15.5px !important;
+    line-height: 21px !important;
     letter-spacing: 0;
     text-align: left;
   }
@@ -1730,8 +1730,10 @@ html[data-scrolled="true"] .headerLine {
     border: 1px solid rgba(165, 165, 112, 0.22);
     border-radius: 8px;
     background: rgba(38, 56, 48, 0.58);
-    font-size: 12.5px !important;
-    line-height: 17px !important;
+    color: #ffffff;
+    font-size: 15px !important;
+    line-height: 20px !important;
+    font-weight: 300;
   }
 
   .riskList li::before {
@@ -1748,6 +1750,12 @@ html[data-scrolled="true"] .headerLine {
     width: 100% !important;
     margin-right: auto;
     margin-left: auto;
+  }
+
+  .protectCta {
+    height: 56px !important;
+    font-size: 14.5px !important;
+    line-height: 16px !important;
   }
 
   .serviceCta {
@@ -1816,10 +1824,10 @@ html[data-scrolled="true"] .headerLine {
 
   .serviceCard {
     grid-template-columns: 42px 1px 1fr;
-    gap: 12px;
+    gap: 14px;
     height: auto;
     min-height: 0;
-    padding: 14px 12px;
+    padding: 16px 14px;
     border-radius: 8px;
     background: rgba(38, 56, 48, 0.62);
   }
@@ -1835,14 +1843,14 @@ html[data-scrolled="true"] .headerLine {
   }
 
   .serviceCard h3 {
-    margin-bottom: 6px;
-    font-size: 13px !important;
-    line-height: 15px !important;
+    margin-bottom: 8px;
+    font-size: 15px !important;
+    line-height: 17px !important;
   }
 
   .serviceCard p {
-    font-size: 11.5px !important;
-    line-height: 14.5px !important;
+    font-size: 14.5px !important;
+    line-height: 19.5px !important;
     text-align: left;
   }
 
@@ -1898,8 +1906,8 @@ html[data-scrolled="true"] .headerLine {
     max-width: 310px;
     margin: 0;
     font-family: "Montserrat LP", Montserrat, Arial, sans-serif;
-    font-size: 12.5px !important;
-    line-height: 17px !important;
+    font-size: 14px !important;
+    line-height: 19px !important;
     font-weight: 300;
     text-align: left;
   }
@@ -2004,8 +2012,8 @@ html[data-scrolled="true"] .headerLine {
   }
 
   .aboutStats span {
-    font-size: 12px !important;
-    line-height: 15px !important;
+    font-size: 13px !important;
+    line-height: 16px !important;
   }
 
   .trustTitle {
@@ -2080,8 +2088,8 @@ html[data-scrolled="true"] .headerLine {
   .miniItem p {
     max-height: 0;
     padding: 0 12px 0 58px;
-    font-size: 12px;
-    line-height: 16px;
+    font-size: 13.5px;
+    line-height: 18px;
     opacity: 0;
   }
 
@@ -2149,8 +2157,8 @@ html[data-scrolled="true"] .headerLine {
   }
 
   .reasons p {
-    font-size: 13px;
-    line-height: 17px;
+    font-size: 14.5px;
+    line-height: 19px;
     text-align: center;
   }
 
@@ -2280,8 +2288,8 @@ html[data-scrolled="true"] .headerLine {
 
   .faqAnswer p {
     padding: 14px 20px 20px;
-    font-size: 13px;
-    line-height: 17px;
+    font-size: 14.5px;
+    line-height: 19.5px;
     text-align: left;
   }
 
