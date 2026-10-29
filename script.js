@@ -231,7 +231,72 @@
     updateActiveLink();
   };
 
+  const setupRiskSequence = () => {
+    const list = document.querySelector('.riskList');
+    const items = Array.from(list.querySelectorAll('li'));
+    const button = document.querySelector('.protectCta');
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const duration = parseFloat(getComputedStyle(list).getPropertyValue('--risk-fill-duration')) || 1800;
+    const encountered = new Set();
+    let nextIndex = 0;
+    let running = false;
+    let buttonStarted = false;
+    let observer;
+    const wait = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+    const finish = () => {
+      items.forEach((item) => { item.dataset.riskState = 'complete'; });
+      button.dataset.riskState = 'complete';
+      list.dataset.riskSequence = 'complete';
+      observer?.disconnect();
+    };
+    if (motion.matches || !('IntersectionObserver' in window)) {
+      finish();
+      return;
+    }
+    list.dataset.riskSequence = 'ready';
+    const advance = async () => {
+      if (running || motion.matches || list.dataset.riskSequence === 'complete') return;
+      running = true;
+      try {
+        while (nextIndex < items.length && encountered.has(items[nextIndex])) {
+          list.dataset.riskSequence = 'running';
+          const item = items[nextIndex];
+          item.dataset.riskState = 'filling';
+          await wait(duration);
+          if (motion.matches) return;
+          item.dataset.riskState = 'complete';
+          nextIndex += 1;
+          await wait(250);
+        }
+        if (nextIndex === items.length && encountered.has(button) && !buttonStarted) {
+          buttonStarted = true;
+          button.dataset.riskState = 'filling';
+          await wait(duration);
+          if (!motion.matches) finish();
+        }
+      } finally {
+        running = false;
+      }
+    };
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          // A fast scroll past a marker must not stall the remaining sequence.
+          const passed = entry.target === button ? items.length : items.indexOf(entry.target) + 1;
+          items.slice(0, passed).forEach((item) => encountered.add(item));
+          if (entry.target === button) encountered.add(button);
+          observer.unobserve(entry.target);
+        }
+      });
+      advance();
+    }, { threshold: 0.25, rootMargin: '0px 0px -8% 0px' });
+    items.forEach((item) => observer.observe(item));
+    observer.observe(button);
+    motion.addEventListener('change', () => { if (motion.matches) finish(); });
+  };
+
   document.addEventListener("DOMContentLoaded", () => {
+    setupRiskSequence();
     document.querySelectorAll('.miniItemHead').forEach((button) => {
       button.addEventListener('click', () => {
         const expanded = button.getAttribute('aria-expanded') !== 'true';
