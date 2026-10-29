@@ -236,7 +236,7 @@
     const items = Array.from(list.querySelectorAll('li'));
     const button = document.querySelector('.protectCta');
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const duration = parseFloat(getComputedStyle(list).getPropertyValue('--risk-fill-duration')) || 1800;
+    const duration = parseFloat(getComputedStyle(list).getPropertyValue('--risk-fill-duration')) || 550;
     const encountered = new Set();
     let nextIndex = 0;
     let running = false;
@@ -266,7 +266,7 @@
           if (motion.matches) return;
           item.dataset.riskState = 'complete';
           nextIndex += 1;
-          await wait(250);
+          await wait(80);
         }
         if (nextIndex === items.length && encountered.has(button) && !buttonStarted) {
           buttonStarted = true;

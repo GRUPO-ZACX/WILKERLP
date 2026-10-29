@@ -2817,7 +2817,7 @@ html { scroll-padding-top: calc(var(--header-offset) + 20px); }
 }
 
 /* Scroll sequence: fill each outline marker, then the outlined CTA. */
-.riskList { --risk-fill-duration: 1800ms; }
+.riskList, .protectCta { --risk-fill-duration: 550ms; }
 .riskList li::before {
   background: linear-gradient(var(--gold), var(--gold)) center bottom / 100% 0% no-repeat;
   transition: background-size var(--risk-fill-duration) ease-in-out;
@@ -2831,7 +2831,7 @@ html { scroll-padding-top: calc(var(--header-offset) + 20px); }
   background: transparent;
   color: var(--gold);
   text-transform: uppercase;
-  transition: color 1800ms ease-in-out, transform 160ms var(--ease-out);
+  transition: color var(--risk-fill-duration) ease-in-out, transform 160ms var(--ease-out);
 }
 .protectCta::before {
   content: "";
@@ -2841,7 +2841,7 @@ html { scroll-padding-top: calc(var(--header-offset) + 20px); }
   background: var(--gold);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 1800ms ease-in-out;
+  transition: transform var(--risk-fill-duration) ease-in-out;
 }
 .protectCta[data-risk-state="filling"],
 .protectCta[data-risk-state="complete"] { color: #14231b; }
