@@ -1,174 +1,319 @@
-const header = document.querySelector(".site-header");
-const menuToggle = document.querySelector("[data-menu-toggle]");
-const siteNav = document.querySelector("#site-nav");
+(() => {
+  const root = document.documentElement;
+  let scrollFrame = 0;
 
-if (header && menuToggle && siteNav) {
-  const setMenuOpen = (isOpen) => {
-    header.classList.toggle("is-menu-open", isOpen);
-    menuToggle.setAttribute("aria-expanded", String(isOpen));
-    menuToggle.setAttribute("aria-label", isOpen ? "Fechar menu" : "Abrir menu");
+  const updateHeaderState = () => {
+    scrollFrame = 0;
+    root.dataset.scrolled = window.scrollY > 36 ? "true" : "false";
   };
 
-  menuToggle.addEventListener("click", () => {
-    setMenuOpen(!header.classList.contains("is-menu-open"));
-  });
-
-  siteNav.addEventListener("click", (event) => {
-    if (event.target.closest("a")) {
-      setMenuOpen(false);
+  const onScroll = () => {
+    if (scrollFrame) {
+      return;
     }
-  });
 
-  window.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      setMenuOpen(false);
+    scrollFrame = window.requestAnimationFrame(updateHeaderState);
+  };
+
+  const findFaqButton = (target) => {
+    if (!(target instanceof Element)) {
+      return null;
     }
-  });
 
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > 760) {
-      setMenuOpen(false);
+    return target.closest("[data-faq-toggle]");
+  };
+
+  const isMobileLayout = () => window.matchMedia('(max-width: 960px)').matches;
+
+  const setFaqExpanded = (card, expanded) => {
+    card.dataset.expanded = expanded ? "true" : "false";
+    const button = card.querySelector("[data-faq-toggle]");
+    const answer = card.querySelector("[id^='faq-answer-']");
+
+    if (button) {
+      button.setAttribute("aria-expanded", String(expanded));
     }
-  });
-}
 
-const platformsCarousel = document.querySelector("[data-platforms-carousel]");
+    if (answer) {
+      answer.setAttribute("aria-hidden", String(!expanded));
+      answer.inert = !expanded;
+      answer.style.maxHeight = expanded ? answer.scrollHeight + "px" : "0px";
+    }
+  };
 
-if (platformsCarousel) {
-  const slides = Array.from(platformsCarousel.querySelectorAll("[data-platforms-slide]"));
-  let activeSlide = 0;
-  let rotationTimer = null;
-  let isVisible = false;
+  const onFaqClick = (event) => {
+    const button = findFaqButton(event.target);
+    const card = button ? button.closest("[data-faq-card]") : null;
 
-  const syncRotation = () => {
-    window.clearInterval(rotationTimer);
-    rotationTimer = null;
+    if (!button || !card) {
+      return;
+    }
 
-    if (isVisible && !document.hidden && slides.length > 1) {
-      rotationTimer = window.setInterval(() => {
-        activeSlide = (activeSlide + 1) % slides.length;
+    const shouldExpand = card.dataset.expanded !== "true";
 
-        slides.forEach((slide, index) => {
-          const isActive = index === activeSlide;
-          slide.classList.toggle("is-active", isActive);
-          slide.setAttribute("aria-hidden", String(!isActive));
+    document.querySelectorAll("[data-faq-card]").forEach((item) => {
+      setFaqExpanded(item, item === card && shouldExpand);
+    });
+  };
+
+  const onFaqResize = () => {
+    document.querySelectorAll("[data-faq-card]").forEach((card) => {
+      setFaqExpanded(card, card.dataset.expanded === "true");
+    });
+  };
+
+  const setupReveal = () => {
+    const revealItems = Array.from(document.querySelectorAll("[data-lp-reveal]"));
+
+    if (!revealItems.length) {
+      return;
+    }
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+      revealItems.forEach((item) => {
+        item.dataset.visible = "true";
+      });
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) {
+            return;
+          }
+
+          const element = entry.target;
+          element.dataset.visible = "true";
+          observer.unobserve(element);
         });
-      }, 2000);
-    }
+      },
+      {
+        rootMargin: "0px 0px 35% 0px",
+        threshold: 0.01,
+      },
+    );
+
+    const markVisibleItems = () => {
+      const revealLine = window.innerHeight * 1.35;
+
+      revealItems.forEach((item) => {
+        if (item.dataset.visible === "true") {
+          return;
+        }
+
+        const rect = item.getBoundingClientRect();
+
+        if (rect.top < revealLine && rect.bottom > -window.innerHeight * 0.25) {
+          item.dataset.visible = "true";
+          observer.unobserve(item);
+        }
+      });
+    };
+
+    revealItems.forEach((item) => observer.observe(item));
+    markVisibleItems();
+    window.addEventListener("scroll", markVisibleItems, { passive: true });
+    window.addEventListener("resize", markVisibleItems);
   };
 
-  document.addEventListener("visibilitychange", syncRotation);
-
-  new IntersectionObserver(([entry]) => {
-    isVisible = entry.isIntersecting && entry.intersectionRatio >= 0.2;
-    syncRotation();
-  }, { threshold: [0, 0.2] }).observe(platformsCarousel);
-}
-
-const feedbackCarousel = document.querySelector(".feedbacks-marquee");
-
-if (feedbackCarousel) {
-  const cards = Array.from(feedbackCarousel.querySelectorAll(".feedback-card"));
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  let reviewTimer = null;
-  let isVisible = false;
-  let isHovered = false;
-  let isTouching = false;
-  let reviewHeightFrame = 0;
-
-  const updateReviewHeight = () => {
-    reviewHeightFrame = 0;
-    const viewport = feedbackCarousel.getBoundingClientRect();
-    let visibleHeight = 0;
-
-    cards.forEach((card) => {
-      const bounds = card.getBoundingClientRect();
-      const overlap = Math.min(bounds.right, viewport.right) - Math.max(bounds.left, viewport.left);
-      if (overlap >= bounds.width * 0.5) {
-        visibleHeight = Math.max(visibleHeight, bounds.height);
+  const setupNavigation = () => {
+    const header = document.querySelector('.header');
+    const nav = document.querySelector('.nav');
+    const toggle = document.querySelector('.menuToggle');
+    const links = Array.from(nav.querySelectorAll('a[href^="#"]'));
+    const destinations = {
+      inicio: '.artboard',
+      assessoria: '.statue',
+      servicos: '.goldBand',
+      sobre: '.coupleMaskA',
+      faq: '.faqPanel',
+      contato: '.finalTitle',
+    };
+    const backdrop = document.querySelector('.menuBackdrop');
+    const board = document.querySelector('.artboard');
+    const setPageInert = (inert) => {
+      Array.from(board.children).forEach((child) => {
+        if (child !== header) child.inert = inert;
+      });
+    };
+    const closeMenu = (restoreFocus = false) => {
+      nav.dataset.open = 'false';
+      root.dataset.menuOpen = 'false';
+      backdrop.hidden = true;
+      setPageInert(false);
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Abrir menu');
+      if (restoreFocus) toggle.focus();
+    };
+    const destinationTop = (id) => {
+      if (id === 'inicio') return 0;
+      const section = document.getElementById(id);
+      if (isMobileLayout() || section.closest('.contentTail')) return section.getBoundingClientRect().top + window.scrollY;
+      const target = document.querySelector(destinations[id]);
+      const artboard = document.querySelector('.artboard');
+      // offsetTop excludes the translate used by the original entrance animation.
+      return artboard.getBoundingClientRect().top + window.scrollY + target.offsetTop;
+    };
+    const updateActiveLink = () => {
+      let current = 'inicio';
+      const readingLine = window.scrollY + header.offsetHeight + 32;
+      Object.keys(destinations).forEach((id) => {
+        if (destinationTop(id) <= readingLine) current = id;
+      });
+      if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) current = 'contato';
+      links.forEach((link) => {
+        if (link.hash === '#' + current) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+    };
+    const navigate = (id, smooth) => {
+      if (!(id in destinations)) return;
+      closeMenu(isMobileLayout());
+      const top = id === 'inicio' ? 0 : Math.max(0, destinationTop(id) - header.offsetHeight - 16);
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top, behavior: smooth && !reduced ? 'smooth' : 'instant' });
+      updateActiveLink();
+    };
+    document.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+        const id = link.hash.slice(1);
+        if (!(id in destinations)) return;
+        event.preventDefault();
+        if (location.hash !== link.hash) history.pushState(null, '', link.hash);
+        navigate(id, true);
+      });
+    });
+    toggle.addEventListener('click', () => {
+      if (toggle.getAttribute('aria-expanded') === 'true') return closeMenu(true);
+      nav.dataset.open = 'true';
+      root.dataset.menuOpen = 'true';
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.setAttribute('aria-label', 'Fechar menu');
+      backdrop.hidden = false;
+      setPageInert(true);
+      nav.querySelector('.menuClose').focus();
+    });
+    nav.querySelector('.menuClose').addEventListener('click', () => closeMenu(true));
+    backdrop.addEventListener('click', () => closeMenu(true));
+    document.addEventListener('click', (event) => {
+      if (!header.contains(event.target)) closeMenu();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (toggle.getAttribute('aria-expanded') !== 'true') return;
+      if (event.key === 'Escape') closeMenu(true);
+      if (event.key === 'Tab') {
+        const controls = Array.from(nav.querySelectorAll('a, button'));
+        const first = controls[0], last = controls[controls.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
       }
     });
-
-    if (visibleHeight) {
-      const height = `${Math.ceil(visibleHeight)}px`;
-      if (feedbackCarousel.style.height !== height) feedbackCarousel.style.height = height;
-    }
-  };
-
-  const requestReviewHeight = () => {
-    if (!reviewHeightFrame) reviewHeightFrame = window.requestAnimationFrame(updateReviewHeight);
-  };
-
-  feedbackCarousel.addEventListener("scroll", requestReviewHeight, { passive: true });
-  window.addEventListener("resize", requestReviewHeight);
-  const reviewResizeObserver = new ResizeObserver(requestReviewHeight);
-  cards.forEach((card) => reviewResizeObserver.observe(card));
-  document.fonts.ready.then(requestReviewHeight);
-  updateReviewHeight();
-
-  const moveReviews = (direction) => {
-    const stride = cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : 0;
-    const maxScroll = feedbackCarousel.scrollWidth - feedbackCarousel.clientWidth;
-    let nextScroll = feedbackCarousel.scrollLeft + stride * direction;
-
-    if (direction > 0 && feedbackCarousel.scrollLeft >= maxScroll - 2) {
-      nextScroll = 0;
-    } else if (direction < 0 && feedbackCarousel.scrollLeft <= 2) {
-      nextScroll = maxScroll;
-    }
-
-    feedbackCarousel.scrollTo({
-      left: Math.max(0, Math.min(nextScroll, maxScroll)),
-      behavior: reducedMotion.matches ? "instant" : "smooth",
+    header.addEventListener('focusout', () => {
+      requestAnimationFrame(() => {
+        if (!header.contains(document.activeElement)) closeMenu();
+      });
     });
+    let frame = 0;
+    window.addEventListener('scroll', () => {
+      if (!frame) frame = requestAnimationFrame(() => { frame = 0; updateActiveLink(); });
+    }, { passive: true });
+    window.matchMedia('(max-width: 960px)').addEventListener('change', () => closeMenu());
+    window.addEventListener('resize', updateActiveLink);
+    window.addEventListener('hashchange', () => navigate(location.hash.slice(1) || 'inicio', false));
+    window.addEventListener('load', () => {
+      if (location.hash) navigate(location.hash.slice(1), false);
+    });
+    closeMenu();
+    updateActiveLink();
   };
 
-  const syncReviews = () => {
-    window.clearInterval(reviewTimer);
-    reviewTimer = null;
-
-    if (isVisible && !document.hidden && !isHovered && !isTouching && !feedbackCarousel.contains(document.activeElement) && cards.length > 1) {
-      reviewTimer = window.setInterval(() => moveReviews(1), 3500);
+  const setupRiskSequence = () => {
+    const list = document.querySelector('.riskList');
+    const items = Array.from(list.querySelectorAll('li'));
+    const button = document.querySelector('.protectCta');
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const duration = parseFloat(getComputedStyle(list).getPropertyValue('--risk-fill-duration')) || 550;
+    const encountered = new Set();
+    let nextIndex = 0;
+    let running = false;
+    let buttonStarted = false;
+    let observer;
+    const wait = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+    const finish = () => {
+      items.forEach((item) => { item.dataset.riskState = 'complete'; });
+      button.dataset.riskState = 'complete';
+      list.dataset.riskSequence = 'complete';
+      observer?.disconnect();
+    };
+    if (motion.matches || !('IntersectionObserver' in window)) {
+      finish();
+      return;
     }
+    list.dataset.riskSequence = 'ready';
+    const advance = async () => {
+      if (running || motion.matches || list.dataset.riskSequence === 'complete') return;
+      running = true;
+      try {
+        while (nextIndex < items.length && encountered.has(items[nextIndex])) {
+          list.dataset.riskSequence = 'running';
+          const item = items[nextIndex];
+          item.dataset.riskState = 'filling';
+          await wait(duration);
+          if (motion.matches) return;
+          item.dataset.riskState = 'complete';
+          nextIndex += 1;
+          await wait(80);
+        }
+        if (nextIndex === items.length && encountered.has(button) && !buttonStarted) {
+          buttonStarted = true;
+          button.dataset.riskState = 'filling';
+          await wait(duration);
+          if (!motion.matches) finish();
+        }
+      } finally {
+        running = false;
+      }
+    };
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          // A fast scroll past a marker must not stall the remaining sequence.
+          const passed = entry.target === button ? items.length : items.indexOf(entry.target) + 1;
+          items.slice(0, passed).forEach((item) => encountered.add(item));
+          if (entry.target === button) encountered.add(button);
+          observer.unobserve(entry.target);
+        }
+      });
+      advance();
+    }, { threshold: 0.25, rootMargin: '0px 0px -8% 0px' });
+    items.forEach((item) => observer.observe(item));
+    observer.observe(button);
+    motion.addEventListener('change', () => { if (motion.matches) finish(); });
   };
 
-  feedbackCarousel.addEventListener("pointerenter", (event) => {
-    if (event.pointerType === "mouse") {
-      isHovered = true;
-      syncReviews();
-    }
+  document.addEventListener("DOMContentLoaded", () => {
+    setupRiskSequence();
+    document.querySelectorAll('.miniItemHead').forEach((button) => {
+      button.addEventListener('click', () => {
+        const expanded = button.getAttribute('aria-expanded') !== 'true';
+        button.setAttribute('aria-expanded', String(expanded));
+        document.getElementById(button.getAttribute('aria-controls')).setAttribute('aria-hidden', String(!expanded));
+      });
+    });
+    setupNavigation();
+    updateHeaderState();
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    document.querySelectorAll("[data-faq-card]").forEach((card) => {
+      setFaqExpanded(card, false);
+    });
+
+    document.addEventListener("click", onFaqClick);
+    window.addEventListener("resize", onFaqResize);
+    window.requestAnimationFrame(setupReveal);
   });
-
-  feedbackCarousel.addEventListener("pointerleave", (event) => {
-    if (event.pointerType === "mouse") {
-      isHovered = false;
-      syncReviews();
-    }
-  });
-
-  feedbackCarousel.addEventListener("touchstart", () => {
-    isTouching = true;
-    syncReviews();
-  }, { passive: true });
-
-  const endTouch = () => {
-    isTouching = false;
-    syncReviews();
-  };
-  feedbackCarousel.addEventListener("touchend", endTouch, { passive: true });
-  feedbackCarousel.addEventListener("touchcancel", endTouch, { passive: true });
-  feedbackCarousel.addEventListener("focusin", syncReviews);
-  feedbackCarousel.addEventListener("focusout", () => window.setTimeout(syncReviews, 0));
-  feedbackCarousel.addEventListener("keydown", (event) => {
-    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-      event.preventDefault();
-      moveReviews(event.key === "ArrowRight" ? 1 : -1);
-    }
-  });
-  document.addEventListener("visibilitychange", syncReviews);
-
-  new IntersectionObserver(([entry]) => {
-    isVisible = entry.isIntersecting;
-    syncReviews();
-  }).observe(feedbackCarousel);
-}
+})();
